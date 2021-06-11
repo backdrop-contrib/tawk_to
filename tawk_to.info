@@ -1,4 +1,6 @@
 name = Tawk.to
-description = Tawk.to
-core = 7.x
+description = integrates the Tawk.to chat service widget with your Backdrop site
+type = module
+backdrop = 1.x
+package = Chat
 configure = admin/config/tawk
