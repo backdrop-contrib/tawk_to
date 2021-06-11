@@ -108,7 +108,7 @@ function tawk_to_preprocess_page(&$variables)
         }
     }
 
-	$variables['page_bottom']. = array(
+	$variables['page_bottom'] .= array(
         '#markup' => tawk_to_render_widget($page_id, $widget_id, $markupOptions),
     );
 
