@@ -108,9 +108,7 @@ function tawk_to_preprocess_page(&$variables)
         }
     }
 
-	$variables['page_bottom'] .= array(
-        '#markup' => tawk_to_render_widget($page_id, $widget_id, $markupOptions),
-    );
+	$variables['page_bottom'] .= tawk_to_render_widget($page_id, $widget_id, $markupOptions);
 
     return $variables;
 }
@@ -250,10 +248,10 @@ function tawk_to_set_widget()
  */
 function tawk_to_remove_widget($a = 0, $b = 0)
 {
-	$config = config('tawk_to.settings');
-	$config->clear('page_id');
-	$config->clear('widget_id');
-	$config->save;
+    $config = config('tawk_to.settings');
+    $config->clear('page_id');
+    $config->clear('widget_id');
+    $config->save;
 
     backdrop_json_output(array('success' => true));
 }
