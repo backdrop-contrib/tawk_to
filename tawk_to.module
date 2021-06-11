@@ -2,31 +2,14 @@
 
 /**
  * @file
- * @package   tawk.to module for Drupal
+ * @package   tawk.to module for Backdrop CMS
  * @copyright (C) 2021 tawk.to
  * @license   GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-
-define('TAWKTO_WIDGET_PAGE_ID', 'tawkto_widget_page_id');
-define('TAWKTO_WIDGET_WIDGET_ID', 'tawkto_widget_widget_id');
-define('TAWKTO_WIDGET_OPTIONS', 'tawkto_widget_options');
-define('TAWKTO_WIDGET_USER_ID', 'tawkto_widget_user_id');
-
 require_once 'views/widget.php.inc';
 require_once 'views/admin.php.inc';
 
-/**
- * Returns help text which is dispalyed in modules page.
- */
-function tawk_to_help($path, $arg)
-{
-    switch ($path) {
-        case "admin/help#tawk_to":
-            return '<p>' . t("Tawk.to widget cutomization, using this module you can select widget which will be used on every page on your site") . '</p>';
-        break;
-    }
-}
 
 /**
  * Retrieves widget details from database.
@@ -34,15 +17,15 @@ function tawk_to_help($path, $arg)
 function tawk_to_get_widget()
 {
     return array(
-            'page_id' => variable_get(TAWKTO_WIDGET_PAGE_ID, ''),
-            'widget_id' => variable_get(TAWKTO_WIDGET_WIDGET_ID, ''),
+            'page_id' => config_get('tawk_to.settings','page_id'),
+            'widget_id' => config_get('tawk_to.settings','widget_id'),
         );
 }
 
 /**
- * Hook for adding widget script to every page.
+ * Implements hook_preprocess_page().
  */
-function tawk_to_page_build(&$page)
+function tawk_to_preprocess_page(&$variables)
 {
     global $base_url;
 
@@ -60,7 +43,7 @@ function tawk_to_page_build(&$page)
     $widget_id = $widget['widget_id'];
 
     // get visibility options
-    $options = variable_get(TAWKTO_WIDGET_OPTIONS, '');
+    $options = config_get('tawk_to.settings','widget_options');
     $markupOptions = array(
         'enable_visitor_recognition' => true, // default value
     );
@@ -92,7 +75,7 @@ function tawk_to_page_build(&$page)
                 }
             }
 
-            if (drupal_is_front_page()) {
+            if (backdrop_is_front_page()) {
                 if (false != $options->show_onfrontpage) {
                     $show = true;
                 }
@@ -125,11 +108,11 @@ function tawk_to_page_build(&$page)
         }
     }
 
-    $page['page_bottom']['tawkto_widget'] = array(
+	$variables['page_bottom']. = array(
         '#markup' => tawk_to_render_widget($page_id, $widget_id, $markupOptions),
     );
 
-    return $page;
+    return $variables;
 }
 
 /**
@@ -147,7 +130,7 @@ function tawk_to_menu()
         'page callback'    => 'system_admin_menu_block_page',
         'access arguments' => array('administer site configuration'),
         'file'             => 'system.admin.inc',
-        'file path'        => drupal_get_path('module', 'system'),
+        'file path'        => backdrop_get_path('module', 'system'),
       );
 
   $items['admin/config/tawk/widget'] = array(
@@ -199,12 +182,12 @@ function tawkto_widget_customization()
 
     global $user;
     $sameUser = true;
-    $value = variable_get(TAWKTO_WIDGET_USER_ID, '');
+    $value = config_get('tawk_to.settings', 'widget_user_id');
     if (!empty($value) && $user->uid!=$value) {
         $sameUser = false;
     }
 
-    $displayOpts = variable_get(TAWKTO_WIDGET_OPTIONS, '');
+    $displayOpts = config_get('tawk_to.settings','widget_options');
     if ($displayOpts && !empty($displayOpts)) {
         $displayOpts = json_decode($displayOpts);
     } else {
@@ -244,22 +227,22 @@ function tawk_to_set_widget()
 {
 
     if (!isset($_POST['pageId']) || !isset($_POST['widgetId'])) {
-        return drupal_json_output(array('success' => false));
+        return backdrop_json_output(array('success' => false));
     }
 
     if (preg_match('/^[0-9A-Fa-f]{24}$/', $_POST['pageId']) !== 1 || preg_match('/^[a-z0-9]{1,50}$/i', $_POST['widgetId']) !== 1) {
-        return drupal_json_output(array('success' => false));
+        return backdrop_json_output(array('success' => false));
     }
 
-    variable_set(TAWKTO_WIDGET_PAGE_ID, $_POST['pageId']);
-    variable_set(TAWKTO_WIDGET_WIDGET_ID, $_POST['widgetId']);
+    config_set('tawk_to.settings', 'page_id', $_POST['pageId']);
+    config_set('tawk_to.settings', 'widget_id', $_POST['widgetId']);
 
     global $user;
     if ($user->uid) {
-        variable_set(TAWKTO_WIDGET_USER_ID, $user->uid);
+        config_set('tawk_to.settings', 'widget_user_id', $user->uid);
     }
 
-    drupal_json_output(array('success' => true));
+    backdrop_json_output(array('success' => true));
 }
 
 /**
@@ -267,10 +250,12 @@ function tawk_to_set_widget()
  */
 function tawk_to_remove_widget($a = 0, $b = 0)
 {
-    variable_del(TAWKTO_WIDGET_PAGE_ID);
-    variable_del(TAWKTO_WIDGET_WIDGET_ID);
+	$config = config('tawk_to.settings');
+	$config->clear('page_id');
+	$config->clear('widget_id');
+	$config->save;
 
-    drupal_json_output(array('success' => true));
+    backdrop_json_output(array('success' => true));
 }
 
 function tawkto_widget_options()
@@ -310,7 +295,7 @@ function tawkto_widget_options()
             }
         }
     }
-    variable_set(TAWKTO_WIDGET_OPTIONS, json_encode($jsonOpts));
+    config_set('tawk_to.settings', 'widget_options', json_encode($jsonOpts));
 
-    drupal_json_output(array('success' => true));
+    backdrop_json_output(array('success' => true));
 }
