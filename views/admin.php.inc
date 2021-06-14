@@ -11,8 +11,7 @@
 */
 function tawk_to_render_widget_iframe($base_url, $iframe_url, $widget=array(), $display_opts = null, $sameUser = true)
 {   ob_start();
-    ?><script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-    <div id="content" >
+    ?><div id="content" >
         <div class="l-wrapper">
             <div class="l-wrapper-inner container container-fluid">
                 <div class="l-messages" role="status" aria-label="Status messages" id="optionsSuccessMessage" style="display: none;">
@@ -33,7 +32,7 @@ function tawk_to_render_widget_iframe($base_url, $iframe_url, $widget=array(), $
                                 <?php if (!$sameUser) { ?>
                                     <div id="widget_already_set" class="alert alert-warning">Notice: Widget already set by other user</div>
                                 <?php } ?>
-                                <iframe id="tawkIframe" src="" style="min-height: 275px; width: 80%; border: none; margin: 5px 0; padding: 10px; background: #FFF;"></iframe>
+                                <iframe id="tawkIframe" src="" style="min-height: 275px; width: 100%; border: none; margin: 5px 0;"></iframe>
                                 <input type="hidden" class="hidden" name="page_id" value="<?php echo $widget['page_id']?>">
                                 <input type="hidden" class="hidden" name="widget_id" value="<?php echo $widget['widget_id']?>">
                             </div>
@@ -66,9 +65,7 @@ function tawk_to_render_widget_iframe($base_url, $iframe_url, $widget=array(), $
                                             <textarea class="form-textarea hide_specific" name="hide_oncustom" id="hide_oncustom" cols="40" rows="6"><?php if (!empty($display_opts->hide_oncustom)) {
                                                     $whitelist = json_decode($display_opts->hide_oncustom);                                                     
                                                     foreach ($whitelist as $page) { echo $page."\r\n"; }
-                                            } else {
-                                            } ?></textarea>
-                                            <div class="grippie"></div>
+                                            }?></textarea>
                                         </div>
                                         <div class="description">
                                             Add URLs to pages in which you would like to hide the widget.<br>
@@ -79,7 +76,7 @@ function tawk_to_render_widget_iframe($base_url, $iframe_url, $widget=array(), $
                                         <?php
                                             $checked = false;
                                             if (!is_null($display_opts)) {
-                                                if (!$display_opts->show_onfrontpage) {
+                                                if ($display_opts->show_onfrontpage) {
                                                     $checked = true;
                                                 }
                                             }
@@ -92,14 +89,14 @@ function tawk_to_render_widget_iframe($base_url, $iframe_url, $widget=array(), $
                                         <?php
                                             $checked = false;
                                             if (!is_null($display_opts)) {
-                                                if (!$display_opts->show_oncategory) {
+                                                if ($display_opts->show_ontaxonomy) {
                                                     $checked = true;
                                                 }
                                             }
                                         ?>
-                                        <input type="checkbox" id="show_oncategory" name="show_oncategory" value="1" class="checkbox show_specific" 
+                                        <input type="checkbox" id="show_ontaxonomy" name="show_ontaxonomy" value="1" class="checkbox show_specific" 
                                             <?php echo ($checked)?'checked':'';?> />
-                                        <label class="option" for="show_oncategory">Show on taxonomy pages</label>
+                                        <label class="option" for="show_ontaxonomy">Show on taxonomy pages</label>
                                         <div class="description">
                                             Select to show on pages for taxonomy terms
                                         </div>										
@@ -110,9 +107,7 @@ function tawk_to_render_widget_iframe($base_url, $iframe_url, $widget=array(), $
                                             <textarea class="form-textarea show_specific" name="show_oncustom" id="show_oncustom" cols="40" rows="6"><?php if (isset($display_opts->show_oncustom) && !empty($display_opts->show_oncustom)) {
                                                 $whitelist = json_decode($display_opts->show_oncustom);                                             
                                                 foreach ($whitelist as $page) { echo $page."\r\n"; }
-                                            } else {
-                                            } ?></textarea>
-                                            <div class="grippie"></div>
+                                            }?></textarea>
 											<div class="description">
                                                 Add URLs to pages in which you would like to show the widget.<br>
                                                 Put each URL in a new line.
@@ -217,23 +212,23 @@ function tawk_to_render_widget_iframe($base_url, $iframe_url, $widget=array(), $
         jQuery(document).ready(function() {
             if(jQuery("#always_display").prop("checked")){
                 jQuery('.show_specific').prop('disabled', true);
-                $(".div_show_specific").hide();
+                jQuery(".div_show_specific").hide();
             } else {
                 jQuery('.hide_specific').prop('disabled', true);
-                $(".div_hide_specific").hide();
+                jQuery(".div_hide_specific").hide();
             }
 
             jQuery("#always_display").change(function() {
                 if(this.checked){
                     jQuery('.hide_specific').prop('disabled', false);
                     jQuery('.show_specific').prop('disabled', true);
-                    $(".div_hide_specific").show();
-                    $(".div_show_specific").hide();
+                    jQuery(".div_hide_specific").show();
+                    jQuery(".div_show_specific").hide();
                 } else {
                     jQuery('.hide_specific').prop('disabled', true);
                     jQuery('.show_specific').prop('disabled', false);
-                    $(".div_hide_specific").hide();
-                    $(".div_show_specific").show();
+                    jQuery(".div_hide_specific").hide();
+                    jQuery(".div_show_specific").show();
                 }
             });
 
@@ -250,7 +245,7 @@ function tawk_to_render_widget_iframe($base_url, $iframe_url, $widget=array(), $
                     if(r.success) {
                         document.body.scrollTop = 0; // For Safari
                         document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
-                        $('#optionsSuccessMessage').toggle().delay(10000).fadeOut();
+                        jQuery('#optionsSuccessMessage').toggle().delay(10000).fadeOut();
                     }
                 });
 
