@@ -66,7 +66,7 @@ function tawk_to_preprocess_page(&$variables)
             $showPages = json_decode($options->show_oncustom);
             $show = false;
             foreach ($showPages as $slug) {
-                if ($currentUrl == $slug) {
+                if ($currentUrl == $base_url.$slug) {
                     $show = true;
                     break;
                 }
@@ -98,7 +98,7 @@ function tawk_to_preprocess_page(&$variables)
                 foreach ($hide_pages as $slug) {
                     $slug = (string) htmlspecialchars($slug); // we need to add htmlspecialchars due to slashes added when saving to database
 
-                    if ($currentUrl == $slug) {
+                    if ($currentUrl == $base_url.$slug) {
                         $show = false;
                         break;
                     }

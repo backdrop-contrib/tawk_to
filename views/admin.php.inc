@@ -69,7 +69,7 @@ function tawk_to_render_widget_iframe($base_url, $iframe_url, $widget=array(), $
                                         </div>
                                         <div class="description">
                                             Add URLs to pages in which you would like to hide the widget.<br>
-                                            Put each URL in a new line.
+                                            Put each URL in a new line and just include the leading '/' and page URL (e.g. /about)
                                         </div>
                                     </div>
                                     <div class="form-item form-type-checkbox div_show_specific">
@@ -110,7 +110,7 @@ function tawk_to_render_widget_iframe($base_url, $iframe_url, $widget=array(), $
                                             }?></textarea>
 											<div class="description">
                                                 Add URLs to pages in which you would like to show the widget.<br>
-                                                Put each URL in a new line.
+                                                Put each URL in a new line and just include the the leading '/' and page URL (e.g. /about)
 										    </div>
                                         </div>
 
