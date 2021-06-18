@@ -14,7 +14,7 @@ function tawk_to_render_widget_iframe($base_url, $iframe_url, $widget=array(), $
     ?><div id="content" >
         <div class="l-wrapper">
             <div class="l-wrapper-inner container container-fluid">
-                <div class="l-messages" role="status" aria-label="Status messages" id="optionsSuccessMessage" style="display: none;">
+                <div class="l-messages success-message-container" role="status" aria-label="Status messages" id="optionsSuccessMessage">
                     <div class="messages status">
                         <h2 class="element-invisible">Status message</h2>
                         Successfully set widget options to your site
@@ -32,7 +32,7 @@ function tawk_to_render_widget_iframe($base_url, $iframe_url, $widget=array(), $
                                 <?php if (!$sameUser) { ?>
                                     <div id="widget_already_set" class="alert alert-warning">Notice: Widget already set by other user</div>
                                 <?php } ?>
-                                <iframe id="tawkIframe" src="" style="min-height: 275px; width: 100%; border: none; margin: 5px 0;"></iframe>
+                                <iframe id="tawkIframe" class="tawkto-property-widget-selection" src="" ></iframe>
                                 <input type="hidden" class="hidden" name="page_id" value="<?php echo $widget['page_id']?>">
                                 <input type="hidden" class="hidden" name="widget_id" value="<?php echo $widget['widget_id']?>">
                             </div>

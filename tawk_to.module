@@ -194,7 +194,10 @@ function tawkto_widget_customization()
     } else {
         $displayOpts = null;
     }
-
+    
+	$module_path = backdrop_get_path('module', 'tawk_to');
+    backdrop_add_css($module_path . '/css/main.css', 'file');
+	
     return tawk_to_render_widget_iframe($base_url, $iframe_url, $widget, $displayOpts, $sameUser);
 }
 
