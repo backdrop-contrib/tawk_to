@@ -7,8 +7,8 @@
  * @license   GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-require_once 'views/widget.php.inc';
-require_once 'views/admin.php.inc';
+require_once 'tawk_to.widget.inc';
+require_once 'tawk_to.admin.inc';
 define('TAWK_TO_PAGE_ID', 'page_id');
 define('TAWK_TO_WIDGET_ID', 'widget_id');
 define('TAWK_TO_WIDGET_OPTIONS', 'widget_options');
