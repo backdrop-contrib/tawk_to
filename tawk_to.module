@@ -254,7 +254,7 @@ function tawk_to_remove_widget($a = 0, $b = 0)
     $config = config(TAWK_TO_CONFIG_NAME);
     $config->clear(TAWK_TO_PAGE_ID);
     $config->clear(TAWK_TO_WIDGET_ID);
-    $config->save;
+    $config->save();
 
     backdrop_json_output(array('success' => true));
 }
