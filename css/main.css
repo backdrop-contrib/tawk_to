@@ -11,7 +11,7 @@
  */
 
 /* notification */
-#optionsSuccessMessage {
+.success-message-container {
 	display: none;
 }
   
