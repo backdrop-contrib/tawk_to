@@ -61,7 +61,7 @@ function tawk_to_preprocess_page(&$variables)
 
         // prepare visibility
         $currentUrl = $base_url.$_SERVER["REQUEST_URI"];
-		if (false==$options->always_display) {
+        if (false==$options->always_display) {
 
             $showPages = json_decode($options->show_oncustom);
             $show = false;
@@ -79,7 +79,7 @@ function tawk_to_preprocess_page(&$variables)
                 }
             }
             
-			// front page
+            // front page
             if (backdrop_is_front_page()) {
                 if (false != $options->show_onfrontpage) {
                     $show = true;
@@ -96,7 +96,8 @@ function tawk_to_preprocess_page(&$variables)
 
                 $currentUrl = (string) $currentUrl;
                 foreach ($hide_pages as $slug) {
-                    $slug = (string) htmlspecialchars($slug); // we need to add htmlspecialchars due to slashes added when saving to database
+                    // we need to add htmlspecialchars due to slashes added when saving to database
+                    $slug = (string) htmlspecialchars($slug); 
 
                     if ($currentUrl == $base_url.$slug) {
                         $show = false;
@@ -111,7 +112,7 @@ function tawk_to_preprocess_page(&$variables)
         }
     }
 
-	$variables['page_bottom'] .= tawk_to_render_widget($page_id, $widget_id, $markupOptions);
+    $variables['page_bottom'] .= tawk_to_render_widget($page_id, $widget_id, $markupOptions);
 
     return $variables;
 }
@@ -194,10 +195,10 @@ function tawkto_widget_customization()
     } else {
         $displayOpts = null;
     }
-    
-	$module_path = backdrop_get_path('module', 'tawk_to');
-    backdrop_add_css($module_path . '/css/main.css', 'file');
-	
+
+    $module_path = backdrop_get_path('module', 'tawk_to');
+    backdrop_add_css($module_path . '/css/tawk_to.admin.css', 'file');
+
     return tawk_to_render_widget_iframe($base_url, $iframe_url, $widget, $displayOpts, $sameUser);
 }
 

@@ -54,9 +54,9 @@ function tawk_to_render_widget_iframe($base_url, $iframe_url, $widget=array(), $
                                         <input type="checkbox" id="always_display" name="always_display" value="1" class="checkbox" 
                                             <?php echo ($checked)?'checked':'';?> />
                                         <label class="option" for="always_display">Always show Tawk.To widget on every page</label>
-										<div class="description">
+                                        <div class="description">
                                             Select to show on all except the exceptions<br>
-											De-select to select the specific pages
+                                            De-select to select the specific pages
                                         </div>
                                     </div>
                                     <div class="form-item form-type-textarea div_hide_specific">
@@ -99,22 +99,21 @@ function tawk_to_render_widget_iframe($base_url, $iframe_url, $widget=array(), $
                                         <label class="option" for="show_ontaxonomy">Show on taxonomy pages</label>
                                         <div class="description">
                                             Select to show on pages for taxonomy terms
-                                        </div>										
+                                        </div>
                                     </div>
                                     <div class="form-item form-type-textarea div_show_specific">
                                         <label for="hide_oncustom">Show on pages:</label>
                                         <div class="form-textarea-wrapper resizable textarea-processed resizable-textarea">
                                             <textarea class="form-textarea show_specific" name="show_oncustom" id="show_oncustom" cols="40" rows="6"><?php if (isset($display_opts->show_oncustom) && !empty($display_opts->show_oncustom)) {
-                                                $whitelist = json_decode($display_opts->show_oncustom);                                             
+                                                $whitelist = json_decode($display_opts->show_oncustom);
                                                 foreach ($whitelist as $page) { echo $page."\r\n"; }
                                             }?></textarea>
-											<div class="description">
+                                            <div class="description">
                                                 Add URLs to pages in which you would like to show the widget.<br>
                                                 Put each URL in a new line and just include the the leading '/' and page URL (e.g. /about)
-										    </div>
+                                            </div>
                                         </div>
-
-                                    </div>                                              
+                                    </div>
                                 </div>
                             </fieldset>
                             <fieldset class="form-wrapper" id="privacy-settings">
@@ -133,7 +132,7 @@ function tawk_to_render_widget_iframe($base_url, $iframe_url, $widget=array(), $
                                         <label class="option" for="enable_visitor_recognition">Enable visitor recognition</label>
                                         <div class="description">
                                             If selected, name and email address from logged in users will be used to identify the user to you when a chat comes in via tawk.to
-                                        </div>										
+                                        </div>
                                     </div>  
                                 </div>
                             </fieldset>

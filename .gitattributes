@@ -1,2 +1,2 @@
 *.module linguist-language=php
-*.php.inc linguist-language=php
+*.inc linguist-language=php
