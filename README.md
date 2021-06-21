@@ -41,15 +41,13 @@ See the LICENSE.txt file in this directory for complete text.
 
 Backdrop CMS integration.
 
-# Resources
-
 # Releases
 
 No releases published
 
 # Packages
 
-No Packages published
+No packages published
 
 # Languages
 
