@@ -147,7 +147,7 @@ function tawk_to_render_widget_iframe($base_url, $iframe_url, $widget=array(), $
     </div>
     <script type="text/javascript">
         var currentHost = window.location.protocol + "//" + window.location.host;
-        var url = "<?php echo $iframe_url; ?>&pltf=drupal&pltfv=7&parentDomain=" + currentHost;
+        var url = "<?php echo $iframe_url; ?>&pltf=backdrop&parentDomain=" + currentHost;
         jQuery("#tawkIframe").attr("src", url);
         var iframe = jQuery("#tawk_widget_customization")[0];
         window.addEventListener("message", function(e) {
