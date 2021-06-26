@@ -247,6 +247,9 @@ function tawk_to_set_widget()
         config_set(TAWK_TO_CONFIG_NAME, TAWK_TO_WIDGET_USER_ID, $user->uid);
     }
 
+    // Flush page cache so widget will appear at next page load
+    cache_flush('page');
+    
     backdrop_json_output(array('success' => true));
 }
 
@@ -260,6 +263,9 @@ function tawk_to_remove_widget($a = 0, $b = 0)
     $config->clear(TAWK_TO_WIDGET_ID);
     $config->save();
 
+    // Flush page cache so widget will appear at next page load
+    cache_flush('page');
+    
     backdrop_json_output(array('success' => true));
 }
 
