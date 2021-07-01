@@ -25,11 +25,11 @@ Bugs and feature requests should be reported in the [Issue Queue](https://github
 # Current Maintainers
 
 - [tawk.to](https://github.com/tawk)
-- [Martin Price](https://github.com/https://github.com/yorkshire-pudding)
+- [Martin Price](https://github.com/yorkshire-pudding)
 
 # Credits
 
-- Ported to Backdrop CMS by [Martin Price](https://github.com/https://github.com/yorkshire-pudding).
+- Ported to Backdrop CMS by [Martin Price](https://github.com/yorkshire-pudding).
 - Originally written for Drupal 7 by [tawk.to](https://github.com/tawk).
 
 # License
