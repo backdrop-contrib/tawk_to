@@ -307,6 +307,7 @@ function tawkto_widget_options()
         }
     }
     config_set(TAWK_TO_CONFIG_NAME, TAWK_TO_WIDGET_OPTIONS, json_encode($jsonOpts));
-
+    // Flush page cache so widget options will update at next page load
+    cache_flush('page');
     backdrop_json_output(array('success' => true));
 }
