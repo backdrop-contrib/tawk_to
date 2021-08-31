@@ -1,42 +1,54 @@
 # tawk.to Live Chat
 
-Free live chat widget for your site
+The tawk.to Live Chat application makes it easy to monitor and chat with
+visitors in your website. Be there when they need you with unlimited
+messaging, ticketing and your own Knowledge Base — all 100% FREE.
 
-## Description
-The tawk.to Drupal module allows you to easily choose which one of your tawk.to widgets you want to use on your drupal page. To create an account, please visit https://tawk.to
+Don't have a tawk.to account yet? [Create one here.](https://www.tawk.to/?utm_source=backdrop&utm_medium=link&utm_campaign=signup)
 
-To answer chats go to https://dashboard.tawk.to/
-* For a full description of the module, visit the project page https://www.drupal.org/project/tawktodrupal7
-* To submit bug reports and feature suggestions, or to track changes please email support@tawk.to
+# Installation
 
-Don't have a tawk.to account yet? [Create one here.](https://www.tawk.to/?utm_source=drupal7&utm_medium=link&utm_campaign=signup)
+1. Install this module using the official [Backdrop CMS instructions](https://backdropcms.org/guide/modules).
+2. Visit the configuration page under Admin page > Configuration > tawk.to >
+    Widget (/admin/config/tawk/widget).
+3. Log in to your tawk.to account and you will be able to select which
+    widget to display.
 
-## Installation
+# Documentation
 
-### Module Installer
-1. Download the [plugin module](https://www.drupal.org/project/tawktodrupal7).
-2. Log in to the your administration panel and go to `Modules`.
-3. In the modules page, click on `Install new module`.
-4. Click on `Choose File`, select the downloaded module, and click on the `Install` button.
-5. After installation completes, click on `Enable newly added modules` link and it'll redirect you back to the `Modules` page.
-6. In the modules page, search for `tawk.to` and enable the module by checking the `Enabled` checkbox.
-7. Lastly, click on `Save Configuration` button to complete the installation.
-
-### Manual Installation
-1. Download the [plugin module](https://www.drupal.org/project/tawktodrupal7) and extract the contents.
-2. In the extracted files, copy the contents of the `tawktodrupal7` directory to `<DRUPAL_INSTALLATION>/modules/tawkto` directory.
-2. Log in to the your administration panel and go to `Modules`.
-3. In the modules page, search for `tawk.to` and enable the module by checking the `Enabled` checkbox.
-4. Lastly, click on `Save Configuration` button to complete the installation.
-
-### Configuration
-1. In the administration panel, go to `Modules`.
-2. In the modules page, search for `tawk.to` and click on the `Configure` link to go to the configuration page.
-3. Click on the `Widget` link to navigate to the widget configuration page.
-4. Log in to your tawk.to account and you will be able to select which widget to display.
-
-## Frequently Asked Questions
 Visit our [Help Center](https://help.tawk.to) for answers to FAQs.
 
-* After installation enable module, go to configuration and choose widget you want to use.
-* It requires that you have tawk.to account before you can start using it. If you don't have one, go to https://www.tawk.to/ to create one for free.
+# Issues
+
+Bugs and feature requests should be reported in the [Issue Queue](https://github.com/backdrop-contrib/tawk_to/issues).
+
+# Current Maintainers
+
+- [tawk.to](https://github.com/tawk)
+- [Martin Price](https://github.com/yorkshire-pudding)
+
+# Credits
+
+- Ported to Backdrop CMS by [Martin Price](https://github.com/yorkshire-pudding).
+- Originally written for Drupal 7 by [tawk.to](https://github.com/tawk).
+
+# License
+
+This project is GPL v3 software
+See the LICENSE.txt file in this directory for complete text.
+
+# About
+
+Backdrop CMS integration.
+
+# Releases
+
+No releases published
+
+# Packages
+
+No packages published
+
+# Languages
+
+- PHP 100.0%
