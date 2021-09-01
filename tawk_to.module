@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @file
  * @package   tawk.to module for Backdrop CMS
@@ -16,298 +15,300 @@ define('TAWK_TO_WIDGET_USER_ID', 'widget_user_id');
 define('TAWK_TO_CONFIG_NAME', 'tawk_to.settings');
 
 /**
- * Retrieves widget details from database.
- */
-function tawk_to_get_widget()
-{
-    return array(
-            'page_id' => config_get(TAWK_TO_CONFIG_NAME, TAWK_TO_PAGE_ID),
-            'widget_id' => config_get(TAWK_TO_CONFIG_NAME,TAWK_TO_WIDGET_ID),
-        );
+* Retrieves widget details from database.
+*/
+function tawk_to_get_widget() {
+  return array(
+    'page_id' => config_get(TAWK_TO_CONFIG_NAME, TAWK_TO_PAGE_ID),
+    'widget_id' => config_get(TAWK_TO_CONFIG_NAME,TAWK_TO_WIDGET_ID),
+  );
 }
 
 /**
- * Implements hook_preprocess_page().
- * Ensures widget appears on all defined pages
- */
-function tawk_to_preprocess_page(&$variables)
-{
-    global $base_url;
+* Implements hook_preprocess_page().
+* Ensures widget appears on all defined pages
+*/
+function tawk_to_preprocess_page(&$variables) {
+  global $base_url;
 
-    // backend checking; do not show chat widget on admin page(s)
-    if (path_is_admin(current_path())) {
+  // backend checking; do not show chat widget on admin page(s)
+  if (path_is_admin(current_path())) {
+    return;
+  }
+
+  $widget = tawk_to_get_widget();
+
+  if ($widget['page_id'] === '' || $widget['widget_id'] === '') {
+    return null;
+  }
+
+  $page_id = $widget['page_id'];
+  $widget_id = $widget['widget_id'];
+
+  // get visibility options
+  $options = config_get(TAWK_TO_CONFIG_NAME, TAWK_TO_WIDGET_OPTIONS);
+  $markupOptions = array(
+    'enable_visitor_recognition' => true, // default value
+  );
+
+  if ($options) {
+    $options = json_decode($options);
+
+    if (isset($options->enable_visitor_recognition)) {
+      $markupOptions['enable_visitor_recognition'] = $options->enable_visitor_recognition;
+    }
+
+    // prepare visibility
+    $currentUrl = $base_url.$_SERVER['REQUEST_URI'];
+
+    if (false==$options->always_display) {
+      $showPages = json_decode($options->show_oncustom);
+      $show = false;
+
+      foreach ($showPages as $slug) {
+        if ($currentUrl == $base_url.$slug) {
+          $show = true;
+          break;
+        }
+      }
+
+      // taxonomy term pages
+      if (arg(0) ==  'taxonomy' && arg(1) == 'term' && is_numeric(arg(2)) && arg(3) == '') {
+        if (false != $options->show_ontaxonomy) {
+          $show = true;
+        }
+      }
+
+      // front page
+      if (backdrop_is_front_page()) {
+        if (false != $options->show_onfrontpage) {
+          $show = true;
+        }
+      }
+
+      if (!$show) {
         return;
+      }
     }
+    else {
+      if (isset($options->hide_oncustom)) {
+        $hide_pages = json_decode($options->hide_oncustom);
+        $show = true;
 
-    $widget = tawk_to_get_widget();
+        $currentUrl = (string) $currentUrl;
+        foreach ($hide_pages as $slug) {
+          // we need to add htmlspecialchars due to slashes added when saving to database
+          $slug = (string) htmlspecialchars($slug);
+                    $slug = (string) htmlspecialchars($slug);
+          $slug = (string) htmlspecialchars($slug);
 
-    if ($widget['page_id'] === '' || $widget['widget_id'] === '') {
-        return null;
-    }
-    $page_id = $widget['page_id'];
-    $widget_id = $widget['widget_id'];
-
-    // get visibility options
-    $options = config_get(TAWK_TO_CONFIG_NAME, TAWK_TO_WIDGET_OPTIONS);
-    $markupOptions = array(
-        'enable_visitor_recognition' => true, // default value
-    );
-    if ($options) {
-        $options = json_decode($options);
-
-        if (isset($options->enable_visitor_recognition)) {
-            $markupOptions['enable_visitor_recognition'] = $options->enable_visitor_recognition;
-        }
-
-        // prepare visibility
-        $currentUrl = $base_url.$_SERVER["REQUEST_URI"];
-        if (false==$options->always_display) {
-
-            $showPages = json_decode($options->show_oncustom);
+          if ($currentUrl == $base_url.$slug) {
             $show = false;
-            foreach ($showPages as $slug) {
-                if ($currentUrl == $base_url.$slug) {
-                    $show = true;
-                    break;
-                }
-            }
-
-            // taxonomy term pages
-            if (arg(0) ==  "taxonomy" && arg(1) == "term" && is_numeric(arg(2)) && arg(3) == "") {
-                if (false != $options->show_ontaxonomy) {
-                    $show = true;
-                }
-            }
-            
-            // front page
-            if (backdrop_is_front_page()) {
-                if (false != $options->show_onfrontpage) {
-                    $show = true;
-                }
-            }
-
-            if (!$show) {
-                return;
-            }
-        } else {
-            if (isset($options->hide_oncustom)) {
-                $hide_pages = json_decode($options->hide_oncustom);
-                $show = true;
-
-                $currentUrl = (string) $currentUrl;
-                foreach ($hide_pages as $slug) {
-                    // we need to add htmlspecialchars due to slashes added when saving to database
-                    $slug = (string) htmlspecialchars($slug); 
-
-                    if ($currentUrl == $base_url.$slug) {
-                        $show = false;
-                        break;
-                    }
-                }
-
-                if (!$show) {
-                    return;
-                }
-            }
+            break;
+          }
         }
+
+        if (!$show) {
+          return;
+        }
+      }
     }
+  }
 
-    $variables['page_bottom'] .= tawk_to_render_widget($page_id, $widget_id, $markupOptions);
+  $variables['page_bottom'] .= tawk_to_render_widget($page_id, $widget_id, $markupOptions);
 
-    return $variables;
+  return $variables;
 }
 
 /**
- * Hooks up configuration menu items and paths for ajax call endpoints.
- */
-function tawk_to_menu()
-{
-
+* Hooks up configuration menu items and paths for ajax call endpoints.
+*/
+function tawk_to_menu() {
   $items = array();
   $items['admin/config/tawk'] = array(
-        'title'            => 'tawk.to',
-        'description'      => 'tawk.to configuration',
-        'position'         => 'left',
-        'weight'           => -100,
-        'page callback'    => 'system_admin_menu_block_page',
-        'access arguments' => array('administer site configuration'),
-        'file'             => 'system.admin.inc',
-        'file path'        => backdrop_get_path('module', 'system'),
-      );
+    'title'            => 'tawk.to',
+    'description'      => 'tawk.to configuration',
+    'position'         => 'left',
+    'weight'           => -100,
+    'page callback'    => 'system_admin_menu_block_page',
+    'access arguments' => array('administer site configuration'),
+    'file'             => 'system.admin.inc',
+    'file path'        => backdrop_get_path('module', 'system'),
+  );
 
   $items['admin/config/tawk/widget'] = array(
-        'title'            => 'Widget',
-        'description'      => 'Included tawk.to widget configuration',
-        'page callback'    => 'tawkto_widget_customization',
-        'access arguments' => array('administer site configuration'),
-        'type'             => MENU_NORMAL_ITEM,
-      );
+    'title'            => 'Widget',
+    'description'      => 'Included tawk.to widget configuration',
+    'page callback'    => 'tawkto_widget_customization',
+    'access arguments' => array('administer site configuration'),
+    'type'             => MENU_NORMAL_ITEM,
+  );
 
   $items['admin/config/tawk/setwidget'] = array(
-        'title'            => 'Set widget',
-        'page callback'    => 'tawk_to_set_widget',
-        'access arguments' => array('administer site configuration'),
-        'type'             => MENU_CALLBACK,
-      );
+    'title'            => 'Set widget',
+    'page callback'    => 'tawk_to_set_widget',
+    'access arguments' => array('administer site configuration'),
+    'type'             => MENU_CALLBACK,
+  );
 
   $items['admin/config/tawk/removewidget'] = array(
-        'title'            => 'Remove widget',
-        'page callback'    => 'tawk_to_remove_widget',
-        'access arguments' => array('administer site configuration'),
-        'type'             => MENU_CALLBACK,
-      );
+    'title'            => 'Remove widget',
+    'page callback'    => 'tawk_to_remove_widget',
+    'access arguments' => array('administer site configuration'),
+    'type'             => MENU_CALLBACK,
+  );
 
   $items['admin/config/tawk/setoptions'] = array(
-        'title'            => 'Set widget options',
-        'page callback'    => 'tawkto_widget_options',
-        'access arguments' => array('administer site configuration'),
-        'type'             => MENU_CALLBACK,
-      );
+    'title'            => 'Set widget options',
+    'page callback'    => 'tawkto_widget_options',
+    'access arguments' => array('administer site configuration'),
+    'type'             => MENU_CALLBACK,
+  );
 
   return $items;
 }
 
 /**
- * Displays widget configuration iframe.
- *
- * Configuration iframe contains functionality from
- * tawk.to server which is responsible for verifying
- * user login details and also retrieves the user's 
- * property and widget list and comunicates back to the
- * parent page so that changes can be saved in the config files.
- */
-function tawkto_widget_customization()
-{
-    $base_url = tawk_to_get_base_url();
-    $iframe_url = tawk_to_get_iframe_url();
-    $widget = tawk_to_get_widget();
+* Displays widget configuration iframe.
+*
+* Configuration iframe contains functionality from
+* tawk.to server which is responsible for verifying
+* user login details and also retrieves the user's
+ * user login details and also retrieves the user's
+* user login details and also retrieves the user's
+* property and widget list and comunicates back to the
+* parent page so that changes can be saved in the config files.
+*/
+function tawkto_widget_customization() {
+  $base_url = tawk_to_get_base_url();
+  $iframe_url = tawk_to_get_iframe_url();
+  $widget = tawk_to_get_widget();
 
-    global $user;
-    $sameUser = true;
-    $value = config_get(TAWK_TO_CONFIG_NAME, TAWK_TO_WIDGET_USER_ID);
-    if (!empty($value) && $user->uid!=$value) {
-        $sameUser = false;
-    }
+  global $user;
+  $sameUser = true;
+  $value = config_get(TAWK_TO_CONFIG_NAME, TAWK_TO_WIDGET_USER_ID);
 
-    $displayOpts = config_get(TAWK_TO_CONFIG_NAME, TAWK_TO_WIDGET_OPTIONS);
-    if ($displayOpts && !empty($displayOpts)) {
-        $displayOpts = json_decode($displayOpts);
-    } else {
-        $displayOpts = null;
-    }
+  if (!empty($value) && $user->uid!=$value) {
+    $sameUser = false;
+  }
 
-    $module_path = backdrop_get_path('module', 'tawk_to');
-    backdrop_add_css($module_path . '/css/tawk_to.admin.css', 'file');
+  $displayOpts = config_get(TAWK_TO_CONFIG_NAME, TAWK_TO_WIDGET_OPTIONS);
 
-    return tawk_to_render_widget_iframe($base_url, $iframe_url, $widget, $displayOpts, $sameUser);
+  if ($displayOpts && !empty($displayOpts)) {
+    $displayOpts = json_decode($displayOpts);
+  }
+  else {
+    $displayOpts = null;
+  }
+
+  $module_path = backdrop_get_path('module', 'tawk_to');
+  backdrop_add_css($module_path . '/css/tawk_to.admin.css', 'file');
+
+  return tawk_to_render_widget_iframe($base_url, $iframe_url, $widget, $displayOpts, $sameUser);
 }
 
 /**
- * Constructs url for configuration iframe.
- */
-function tawk_to_get_iframe_url()
-{
-    $widget = tawk_to_get_widget();
-    if (!$widget) {
-        $widget = array(
-                'page_id'   => '',
-                'widget_id' => '',
-            );
-    }
-    return tawk_to_get_base_url() . '/generic/widgets?currentWidgetId=' . $widget['widget_id'] . '&currentPageId=' . $widget['page_id'];
+* Constructs url for configuration iframe.
+*/
+function tawk_to_get_iframe_url() {
+  $widget = tawk_to_get_widget();
+
+  if (!$widget) {
+    $widget = array(
+      'page_id'   => '',
+      'widget_id' => '',
+    );
+  }
+  return tawk_to_get_base_url() . '/generic/widgets?currentWidgetId=' . $widget['widget_id'] . '&currentPageId=' . $widget['page_id'];
 }
 
 /**
- * Base url for tawk.to application which serves iframe.
- */
-function tawk_to_get_base_url()
-{
-    return 'https://plugins.tawk.to';
+* Base url for tawk.to application which serves iframe.
+*/
+function tawk_to_get_base_url() {
+  return 'https://plugins.tawk.to';
 }
 
 /**
- * Ajax endpoint which is used to set selected widget details.
- */
-function tawk_to_set_widget()
-{
+* Ajax endpoint which is used to set selected widget details.
+*/
+function tawk_to_set_widget() {
+  if (!isset($_POST['pageId']) || !isset($_POST['widgetId'])) {
+    return backdrop_json_output(array('success' => false));
+  }
 
-    if (!isset($_POST['pageId']) || !isset($_POST['widgetId'])) {
-        return backdrop_json_output(array('success' => false));
-    }
+  if (preg_match('/^[0-9A-Fa-f]{24}$/', $_POST['pageId']) !== 1 || preg_match('/^[a-z0-9]{1,50}$/i', $_POST['widgetId']) !== 1) {
+    return backdrop_json_output(array('success' => false));
+  }
 
-    if (preg_match('/^[0-9A-Fa-f]{24}$/', $_POST['pageId']) !== 1 || preg_match('/^[a-z0-9]{1,50}$/i', $_POST['widgetId']) !== 1) {
-        return backdrop_json_output(array('success' => false));
-    }
+  config_set(TAWK_TO_CONFIG_NAME, TAWK_TO_PAGE_ID, $_POST['pageId']);
+  config_set(TAWK_TO_CONFIG_NAME, TAWK_TO_WIDGET_ID, $_POST['widgetId']);
 
-    config_set(TAWK_TO_CONFIG_NAME, TAWK_TO_PAGE_ID, $_POST['pageId']);
-    config_set(TAWK_TO_CONFIG_NAME, TAWK_TO_WIDGET_ID, $_POST['widgetId']);
+  global $user;
+  if ($user->uid) {
+    config_set(TAWK_TO_CONFIG_NAME, TAWK_TO_WIDGET_USER_ID, $user->uid);
+  }
 
-    global $user;
-    if ($user->uid) {
-        config_set(TAWK_TO_CONFIG_NAME, TAWK_TO_WIDGET_USER_ID, $user->uid);
-    }
+  // Flush page cache so widget will appear at next page load
+  cache_flush('page');
 
-    // Flush page cache so widget will appear at next page load
-    cache_flush('page');
-    
-    backdrop_json_output(array('success' => true));
+  backdrop_json_output(array('success' => true));
 }
 
 /**
- * Ajax endpoint which is used to remove currently selected widget details.
- */
-function tawk_to_remove_widget($a = 0, $b = 0)
-{
-    $config = config(TAWK_TO_CONFIG_NAME);
-    $config->clear(TAWK_TO_PAGE_ID);
-    $config->clear(TAWK_TO_WIDGET_ID);
-    $config->save();
+* Ajax endpoint which is used to remove currently selected widget details.
+*/
+function tawk_to_remove_widget($a = 0, $b = 0) {
+  $config = config(TAWK_TO_CONFIG_NAME);
+  $config->clear(TAWK_TO_PAGE_ID);
+  $config->clear(TAWK_TO_WIDGET_ID);
+  $config->save();
 
-    // Flush page cache so widget will disappear at next page load
-    cache_flush('page');
-    
-    backdrop_json_output(array('success' => true));
+  // Flush page cache so widget will disappear at next page load
+  cache_flush('page');
+
+  backdrop_json_output(array('success' => true));
 }
 
-function tawkto_widget_options()
-{
-    $jsonOpts = array(
-            'always_display' => false,
-            'hide_oncustom' => array(),
-            'show_onfrontpage' => false,
-            'show_ontaxonomy' => false,
-            'show_onproduct' => false,
-            'show_oncustom' => array(),
-            'enable_visitor_recognition' => false
-        );
+function tawkto_widget_options() {
+  $jsonOpts = array(
+    'always_display' => false,
+    'hide_oncustom' => array(),
+    'show_onfrontpage' => false,
+    'show_ontaxonomy' => false,
+    'show_onproduct' => false,
+    'show_oncustom' => array(),
+    'enable_visitor_recognition' => false
+  );
 
-    if (isset($_REQUEST['options']) && !empty($_REQUEST['options'])) {
-        $options = explode('&', $_REQUEST['options']);
-        foreach ($options as $post) {
-            list($column, $value) = explode('=', $post);
-            switch ($column) {
-                case 'hide_oncustom':
-                case 'show_oncustom':
-                    // replace newlines and returns with comma, and convert to array for saving
-                    $value = urldecode($value);
-                    $value = str_ireplace(["\r\n", "\r", "\n"], ',', $value);
-                    $value = explode(",", $value);
-                    $value = (empty($value)||!$value)?array():$value;
-                    $jsonOpts[$column] = json_encode($value);
-                    break;
-
-                case 'show_onfrontpage':
-                case 'show_ontaxonomy':
-                case 'show_onproduct':
-                case 'always_display':
-                case 'enable_visitor_recognition':
-                    $jsonOpts[$column] = $value == 1;
-                    break;
-            }
-        }
+  if (isset($_REQUEST['options']) && !empty($_REQUEST['options'])) {
+    $options = explode('&', $_REQUEST['options']);
+    foreach ($options as $post) {
+      list($column, $value) = explode('=', $post);
+      switch ($column) {
+        case 'hide_oncustom':
+        case 'show_oncustom':
+          // replace newlines and returns with comma, and convert to array for saving
+          $value = urldecode($value);
+          $value = str_ireplace(['\r\n', '\r', '\n'], ',', $value);
+          $value = explode(',', $value);
+          $value = (empty($value)||!$value)?array():$value;
+          $jsonOpts[$column] = json_encode($value);
+          break;
+        case 'show_onfrontpage':
+        case 'show_ontaxonomy':
+        case 'show_onproduct':
+        case 'always_display':
+        case 'enable_visitor_recognition':
+          $jsonOpts[$column] = $value == 1;
+          break;
+      }
     }
-    config_set(TAWK_TO_CONFIG_NAME, TAWK_TO_WIDGET_OPTIONS, json_encode($jsonOpts));
-    // Flush page cache so widget options will update at next page load
-    cache_flush('page');
-    backdrop_json_output(array('success' => true));
+  }
+
+  config_set(TAWK_TO_CONFIG_NAME, TAWK_TO_WIDGET_OPTIONS, json_encode($jsonOpts));
+
+  // Flush page cache so widget options will update at next page load
+  cache_flush('page');
+  backdrop_json_output(array('success' => true));
 }
