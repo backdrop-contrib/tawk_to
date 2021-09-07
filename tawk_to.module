@@ -139,7 +139,7 @@ function tawk_to_menu() {
   $items['admin/config/tawk/widget'] = array(
     'title'            => 'Widget',
     'description'      => 'Included tawk.to widget configuration',
-    'page callback'    => 'tawkto_widget_customization',
+    'page callback'    => 'tawk_to_admin_page',
     'access arguments' => array('administer site configuration'),
     'type'             => MENU_NORMAL_ITEM,
   );
@@ -158,32 +158,13 @@ function tawk_to_menu() {
     'type'             => MENU_CALLBACK,
   );
 
-  $items['admin/config/tawk/setoptions'] = array(
-    'title'            => 'Set widget options',
-    'page callback'    => 'tawkto_widget_options',
-    'access arguments' => array('administer site configuration'),
-    'type'             => MENU_CALLBACK,
-  );
-
   return $items;
 }
 
 /**
-* Displays widget configuration iframe.
-*
-* Configuration iframe contains functionality from
-* tawk.to server which is responsible for verifying
-* user login details and also retrieves the user's
- * user login details and also retrieves the user's
-* user login details and also retrieves the user's
-* property and widget list and comunicates back to the
-* parent page so that changes can be saved in the config files.
-*/
-function tawkto_widget_customization() {
-  $base_url = tawk_to_get_base_url();
-  $iframe_url = tawk_to_get_iframe_url();
-  $widget = tawk_to_get_widget();
-
+ * Implements tawk.to module admin page
+ */
+function tawk_to_admin_page() {
   global $user;
   $sameUser = true;
   $value = config_get(TAWK_TO_CONFIG_NAME, TAWK_TO_WIDGET_USER_ID);
@@ -192,19 +173,28 @@ function tawkto_widget_customization() {
     $sameUser = false;
   }
 
-  $displayOpts = config_get(TAWK_TO_CONFIG_NAME, TAWK_TO_WIDGET_OPTIONS);
+  $visibility_opts_form = backdrop_get_form('tawk_to_visibility_opts_form');
 
-  if ($displayOpts && !empty($displayOpts)) {
-    $displayOpts = json_decode($displayOpts);
-  }
-  else {
-    $displayOpts = null;
-  }
+  return theme('tawk_to_admin_page', array(
+    'base_url' => tawk_to_get_base_url(),
+    'iframe_url' => tawk_to_get_iframe_url(),
+    'widget' => tawk_to_get_widget(),
+    'sameUser' => $sameUser,
+    'visibility_opts_form' => render($visibility_opts_form)
+  ));
+}
 
-  $module_path = backdrop_get_path('module', 'tawk_to');
-  backdrop_add_css($module_path . '/css/tawk_to.admin.css', 'file');
-
-  return tawk_to_render_widget_iframe($base_url, $iframe_url, $widget, $displayOpts, $sameUser);
+/**
+ * Implements module theme hook for templates usage.
+ */
+function tawk_to_theme() {
+  return array(
+    'tawk_to_admin_page' => array(
+      'variables' => array('title' => NULL),
+      'template' => 'admin',
+      'path' => backdrop_get_path('module', 'tawk_to') . '/templates'
+    )
+  );
 }
 
 /**
@@ -267,48 +257,5 @@ function tawk_to_remove_widget($a = 0, $b = 0) {
   // Flush page cache so widget will disappear at next page load
   cache_flush('page');
 
-  backdrop_json_output(array('success' => true));
-}
-
-function tawkto_widget_options() {
-  $jsonOpts = array(
-    'always_display' => false,
-    'hide_oncustom' => array(),
-    'show_onfrontpage' => false,
-    'show_ontaxonomy' => false,
-    'show_onproduct' => false,
-    'show_oncustom' => array(),
-    'enable_visitor_recognition' => false
-  );
-
-  if (isset($_REQUEST['options']) && !empty($_REQUEST['options'])) {
-    $options = explode('&', $_REQUEST['options']);
-    foreach ($options as $post) {
-      list($column, $value) = explode('=', $post);
-      switch ($column) {
-        case 'hide_oncustom':
-        case 'show_oncustom':
-          // replace newlines and returns with comma, and convert to array for saving
-          $value = urldecode($value);
-          $value = str_ireplace(['\r\n', '\r', '\n'], ',', $value);
-          $value = explode(',', $value);
-          $value = (empty($value)||!$value)?array():$value;
-          $jsonOpts[$column] = json_encode($value);
-          break;
-        case 'show_onfrontpage':
-        case 'show_ontaxonomy':
-        case 'show_onproduct':
-        case 'always_display':
-        case 'enable_visitor_recognition':
-          $jsonOpts[$column] = $value == 1;
-          break;
-      }
-    }
-  }
-
-  config_set(TAWK_TO_CONFIG_NAME, TAWK_TO_WIDGET_OPTIONS, json_encode($jsonOpts));
-
-  // Flush page cache so widget options will update at next page load
-  cache_flush('page');
   backdrop_json_output(array('success' => true));
 }
