@@ -99,8 +99,6 @@ function tawk_to_preprocess_page(&$variables) {
         foreach ($hide_pages as $slug) {
           // we need to add htmlspecialchars due to slashes added when saving to database
           $slug = (string) htmlspecialchars($slug);
-                    $slug = (string) htmlspecialchars($slug);
-          $slug = (string) htmlspecialchars($slug);
 
           if ($currentUrl == $base_url.$slug) {
             $show = false;
@@ -180,7 +178,7 @@ function tawk_to_admin_page() {
     'iframe_url' => tawk_to_get_iframe_url(),
     'widget' => tawk_to_get_widget(),
     'sameUser' => $sameUser,
-    'visibility_opts_form' => render($visibility_opts_form)
+    'visibility_opts_form' => render($visibility_opts_form),
   ));
 }
 
@@ -192,7 +190,7 @@ function tawk_to_theme() {
     'tawk_to_admin_page' => array(
       'variables' => array('title' => NULL),
       'template' => 'admin',
-      'path' => backdrop_get_path('module', 'tawk_to') . '/templates'
+      'path' => backdrop_get_path('module', 'tawk_to') . '/templates',
     )
   );
 }

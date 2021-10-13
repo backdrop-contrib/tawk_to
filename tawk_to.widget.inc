@@ -9,15 +9,13 @@
 /**
  * Creates markup for embed script element.
  */
-function tawk_to_render_widget($page_id, $widget_id, $options)
-{
+function tawk_to_render_widget($page_id, $widget_id, $options) {
   global $user;
   $apiString = '';
-  if ($GLOBALS['user']->uid && $options['enable_visitor_recognition']) {
-    global $user;
+  if ($user->uid && $options['enable_visitor_recognition']) {
     $apiString = '$_Tawk_API.visitor = {
-      name  : "'.$user->name.'",
-      email : "'.$user->mail.'",
+      name  : "' . $user->name . '",
+      email : "' . $user->mail . '",
     };';
   }
 

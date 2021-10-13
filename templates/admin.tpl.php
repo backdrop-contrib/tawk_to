@@ -29,7 +29,7 @@ backdrop_add_css($module_path . '/css/tawk_to.admin.css', 'file');
               <input type="hidden" class="hidden" name="widget_id" value="<?php echo $widget['widget_id']?>">
             </div>
           </fieldset>
-		  <?php print $visibility_opts_form ?>
+          <?php print $visibility_opts_form ?>
         </div>
       </div>
     </div>

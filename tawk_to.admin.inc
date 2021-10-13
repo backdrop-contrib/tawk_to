@@ -23,7 +23,7 @@ function tawk_to_visibility_opts_form($form, &$form_state) {
   $form['visibility_settings'] = array(
     '#type' => 'fieldset',
     '#title' => t('Visibility Settings'),
-    '#description' => t('Define where the tawk.to widget will and won\'t show')
+    '#description' => t('Define where the tawk.to widget will and won\'t show'),
   );
 
   // always display config
@@ -38,7 +38,7 @@ function tawk_to_visibility_opts_form($form, &$form_state) {
     '#description' => t('Select to show on all except the exceptions
     De-select to select the specific pages'),
     '#id' => t('always_display'),
-    '#attributes' => $always_display_attr
+    '#attributes' => $always_display_attr,
   );
 
   // exclude url config
@@ -51,7 +51,7 @@ function tawk_to_visibility_opts_form($form, &$form_state) {
     '#suffix' => '</div>',
     '#id' => t('hide_oncustom'),
     '#default_value' => !is_null($display_opts) && $display_opts->hide_oncustom ?
-      format_multiline_url_paths($display_opts->hide_oncustom) : ''
+      format_multiline_url_paths($display_opts->hide_oncustom) : '',
   );
 
   // show on front page config
@@ -66,7 +66,7 @@ function tawk_to_visibility_opts_form($form, &$form_state) {
     '#prefix' => '<div class="div_show_specific">',
     '#suffix' => '</div>',
     '#id' => t('show_onfrontpage'),
-    '#attributes' => $show_onfrontpage_attr
+    '#attributes' => $show_onfrontpage_attr,
   );
 
   // show on taxonomy config
@@ -82,7 +82,7 @@ function tawk_to_visibility_opts_form($form, &$form_state) {
     '#prefix' => '<div class="div_show_specific">',
     '#suffix' => '</div>',
     '#id' => t('show_ontaxonomy'),
-    '#attributes' => $show_ontaxonomy_attr
+    '#attributes' => $show_ontaxonomy_attr,
   );
 
   // include urls config
@@ -98,14 +98,14 @@ function tawk_to_visibility_opts_form($form, &$form_state) {
     '#prefix' => '<div class="div_show_specific">',
     '#suffix' => '</div>',
     '#id' => t('show_oncustom'),
-    '#default_value' =>  $show_oncustom_default_value
+    '#default_value' =>  $show_oncustom_default_value,
   );
 
   // privacy settings
   $form['privacy_settings'] = array(
     '#type' => 'fieldset',
     '#title' => t('Privacy Settings'),
-    '#description' => t('Define whether or not user information can be used')
+    '#description' => t('Define whether or not user information can be used'),
   );
 
   // enable visitor recognition config
@@ -118,7 +118,7 @@ function tawk_to_visibility_opts_form($form, &$form_state) {
     '#title' => t('Enable visitor recognition'),
     '#description' => t('If selected, name and email address from logged in users will be used to identify the user to you when a chat comes in via tawk.to'),
     '#id' => t('enable_visitor_recognition'),
-    '#attributes' => $enable_visitor_recognition_attr
+    '#attributes' => $enable_visitor_recognition_attr,
   );
 
   // submit button
@@ -143,7 +143,7 @@ function tawk_to_visibility_opts_form_submit($form, &$form_state) {
     'show_onfrontpage' => false,
     'show_ontaxonomy' => false,
     'show_oncustom' => array(),
-    'enable_visitor_recognition' => false
+    'enable_visitor_recognition' => false,
   );
 
   $options = $form_state['values'];
