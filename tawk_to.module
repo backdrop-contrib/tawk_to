@@ -8,35 +8,21 @@
 
 require_once 'tawk_to.widget.inc';
 require_once 'tawk_to.admin.inc';
-define('TAWK_TO_PAGE_ID', 'page_id');
-define('TAWK_TO_WIDGET_ID', 'widget_id');
-define('TAWK_TO_WIDGET_OPTIONS', 'widget_options');
-define('TAWK_TO_WIDGET_USER_ID', 'widget_user_id');
-define('TAWK_TO_CONFIG_NAME', 'tawk_to.settings');
-
-/**
-* Retrieves widget details from database.
-*/
-function tawk_to_get_widget() {
-  return array(
-    'page_id' => config_get(TAWK_TO_CONFIG_NAME, TAWK_TO_PAGE_ID),
-    'widget_id' => config_get(TAWK_TO_CONFIG_NAME,TAWK_TO_WIDGET_ID),
-  );
-}
+require_once 'includes/tawk_to.helper.php';
 
 /**
 * Implements hook_preprocess_page().
 * Ensures widget appears on all defined pages
 */
 function tawk_to_preprocess_page(&$variables) {
-  global $base_url;
+  $base_url = TawkHelper::get_base_url();
 
   // backend checking; do not show chat widget on admin page(s)
   if (path_is_admin(current_path())) {
     return;
   }
 
-  $widget = tawk_to_get_widget();
+  $widget = TawkHelper::get_widget();
 
   if ($widget['page_id'] === '' || $widget['widget_id'] === '') {
     return null;
@@ -46,7 +32,10 @@ function tawk_to_preprocess_page(&$variables) {
   $widget_id = $widget['widget_id'];
 
   // get visibility options
-  $options = config_get(TAWK_TO_CONFIG_NAME, TAWK_TO_WIDGET_OPTIONS);
+  $options = config_get(
+    TawkHelper::TAWK_TO_CONFIG_NAME,
+    TawkHelper::TAWK_TO_WIDGET_OPTIONS
+  );
   $markupOptions = array(
     'enable_visitor_recognition' => true, // default value
   );
@@ -137,7 +126,8 @@ function tawk_to_menu() {
   $items['admin/config/tawk/widget'] = array(
     'title'            => 'Widget',
     'description'      => 'Included tawk.to widget configuration',
-    'page callback'    => 'tawk_to_admin_page',
+    'page callback'    => 'backdrop_get_form',
+    'page arguments'   => array('tawk_to_admin_form'),
     'access arguments' => array('administer site configuration'),
     'type'             => MENU_NORMAL_ITEM,
   );
@@ -160,64 +150,6 @@ function tawk_to_menu() {
 }
 
 /**
- * Implements tawk.to module admin page
- */
-function tawk_to_admin_page() {
-  global $user;
-  $sameUser = true;
-  $value = config_get(TAWK_TO_CONFIG_NAME, TAWK_TO_WIDGET_USER_ID);
-
-  if (!empty($value) && $user->uid!=$value) {
-    $sameUser = false;
-  }
-
-  $visibility_opts_form = backdrop_get_form('tawk_to_visibility_opts_form');
-
-  return theme('tawk_to_admin_page', array(
-    'base_url' => tawk_to_get_base_url(),
-    'iframe_url' => tawk_to_get_iframe_url(),
-    'widget' => tawk_to_get_widget(),
-    'sameUser' => $sameUser,
-    'visibility_opts_form' => render($visibility_opts_form),
-  ));
-}
-
-/**
- * Implements module theme hook for templates usage.
- */
-function tawk_to_theme() {
-  return array(
-    'tawk_to_admin_page' => array(
-      'variables' => array('title' => NULL),
-      'template' => 'admin',
-      'path' => backdrop_get_path('module', 'tawk_to') . '/templates',
-    )
-  );
-}
-
-/**
-* Constructs url for configuration iframe.
-*/
-function tawk_to_get_iframe_url() {
-  $widget = tawk_to_get_widget();
-
-  if (!$widget) {
-    $widget = array(
-      'page_id'   => '',
-      'widget_id' => '',
-    );
-  }
-  return tawk_to_get_base_url() . '/generic/widgets?currentWidgetId=' . $widget['widget_id'] . '&currentPageId=' . $widget['page_id'];
-}
-
-/**
-* Base url for tawk.to application which serves iframe.
-*/
-function tawk_to_get_base_url() {
-  return 'https://plugins.tawk.to';
-}
-
-/**
 * Ajax endpoint which is used to set selected widget details.
 */
 function tawk_to_set_widget() {
@@ -229,12 +161,13 @@ function tawk_to_set_widget() {
     return backdrop_json_output(array('success' => false));
   }
 
-  config_set(TAWK_TO_CONFIG_NAME, TAWK_TO_PAGE_ID, $_POST['pageId']);
-  config_set(TAWK_TO_CONFIG_NAME, TAWK_TO_WIDGET_ID, $_POST['widgetId']);
+  $config_name = TawkHelper::TAWK_TO_CONFIG_NAME;
+  config_set($config_name, TawkHelper::TAWK_TO_PAGE_ID, $_POST['pageId']);
+  config_set($config_name, TawkHelper::TAWK_TO_WIDGET_ID, $_POST['widgetId']);
 
   global $user;
   if ($user->uid) {
-    config_set(TAWK_TO_CONFIG_NAME, TAWK_TO_WIDGET_USER_ID, $user->uid);
+    config_set($config_name, TawkHelper::TAWK_TO_WIDGET_USER_ID, $user->uid);
   }
 
   // Flush page cache so widget will appear at next page load
@@ -247,9 +180,9 @@ function tawk_to_set_widget() {
 * Ajax endpoint which is used to remove currently selected widget details.
 */
 function tawk_to_remove_widget($a = 0, $b = 0) {
-  $config = config(TAWK_TO_CONFIG_NAME);
-  $config->clear(TAWK_TO_PAGE_ID);
-  $config->clear(TAWK_TO_WIDGET_ID);
+  $config = config(TawkHelper::TAWK_TO_CONFIG_NAME);
+  $config->clear(TawkHelper::TAWK_TO_PAGE_ID);
+  $config->clear(TawkHelper::TAWK_TO_WIDGET_ID);
   $config->save();
 
   // Flush page cache so widget will disappear at next page load
