@@ -19,7 +19,7 @@ function tawk_to_admin_form($form, &$form_state) {
   $iframe_url = TawkHelper::get_iframe_url();
   $display_opts = config_get(
     TawkHelper::TAWK_TO_CONFIG_NAME,
-    TawkHelper::TAWK_TO_WIDGET_OPTIONS
+    TawkHelper::TAWK_TO_WIDGET_OPTIONS,
   );
 
   if ($display_opts && !empty($display_opts)) {
@@ -30,14 +30,14 @@ function tawk_to_admin_form($form, &$form_state) {
   }
 
   // css and js files
-  $module_path = backdrop_get_path('module', 'tawk_to');
+  $module_path = TawkHelper::get_module_path();
   $form['#attached']['css'][] = array(
     'data' => $module_path . '/css/tawk_to.admin.css',
-    'type' => 'file'
+    'type' => 'file',
   );
   $form['#attached']['js'][] = array(
     'data' => $module_path . '/js/tawk_to.admin.js',
-    'type' => 'file'
+    'type' => 'file',
   );
 
   $form['#attached']['js'][] = array(
@@ -79,7 +79,7 @@ function build_widget_selection($same_user, $widget) {
   if(!$same_user) {
     $form['already_set'] = array(
       '#type' => 'markup',
-      '#markup' => '<div id="widget_already_set" class="alert alert-warning">Notice: Widget already set by other user</div>'
+      '#markup' => '<div id="widget_already_set" class="alert alert-warning">Notice: Widget already set by other user</div>',
     );
   }
 

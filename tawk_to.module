@@ -6,7 +6,6 @@
  * @license   GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-require_once 'tawk_to.widget.inc';
 require_once 'tawk_to.admin.inc';
 require_once 'includes/tawk_to.helper.php';
 
@@ -15,6 +14,7 @@ require_once 'includes/tawk_to.helper.php';
 * Ensures widget appears on all defined pages
 */
 function tawk_to_preprocess_page(&$variables) {
+  global $user;
   $base_url = TawkHelper::get_base_url();
 
   // backend checking; do not show chat widget on admin page(s)
@@ -34,17 +34,17 @@ function tawk_to_preprocess_page(&$variables) {
   // get visibility options
   $options = config_get(
     TawkHelper::TAWK_TO_CONFIG_NAME,
-    TawkHelper::TAWK_TO_WIDGET_OPTIONS
+    TawkHelper::TAWK_TO_WIDGET_OPTIONS,
   );
-  $markupOptions = array(
-    'enable_visitor_recognition' => true, // default value
-  );
+
+  // initial markup options
+  $enable_visitor_recognition = true; // default value
 
   if ($options) {
     $options = json_decode($options);
 
     if (isset($options->enable_visitor_recognition)) {
-      $markupOptions['enable_visitor_recognition'] = $options->enable_visitor_recognition;
+      $enable_visitor_recognition = $options->enable_visitor_recognition;
     }
 
     // prepare visibility
@@ -102,7 +102,23 @@ function tawk_to_preprocess_page(&$variables) {
     }
   }
 
-  $variables['page_bottom'] .= tawk_to_render_widget($page_id, $widget_id, $markupOptions);
+  $widget_options = array(
+    'pageId' => $page_id,
+    'widgetId' => $widget_id,
+    'enableVisitorRecognition' => $enable_visitor_recognition,
+  );
+
+  if ($user->uid && $enable_visitor_recognition) {
+    $widget_options['user'] = array(
+      'name' => $user->name,
+      'email' => $user->mail,
+    );
+  }
+
+  backdrop_add_js(TawkHelper::get_module_path() . '/js/tawk_to.widget.js', 'file');
+  backdrop_add_js(array(
+    'tawkto' => $widget_options,
+  ), 'setting');
 
   return $variables;
 }

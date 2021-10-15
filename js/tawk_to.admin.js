@@ -1,7 +1,7 @@
 'use strict';
 
 // initialize variables
-var tawktoSettings = Backdrop.settings.tawkto;
+var tawktoSettings = Backdrop.settings.tawkto || {};
 var currentHost = window.location.protocol + "//" + window.location.host;
 var url = tawktoSettings.iframeUrl + "&pltf=backdrop&parentDomain=" + currentHost;
 var iframe = jQuery("#tawk_widget_customization")[0];
