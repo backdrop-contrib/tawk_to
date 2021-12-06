@@ -34,7 +34,7 @@ function tawk_to_preprocess_page(&$variables) {
   // get visibility options
   $options = config_get(
     TawkHelper::TAWK_TO_CONFIG_NAME,
-    TawkHelper::TAWK_TO_WIDGET_OPTIONS,
+    TawkHelper::TAWK_TO_WIDGET_OPTIONS
   );
 
   // initial markup options
@@ -195,7 +195,7 @@ function tawk_to_set_widget() {
 /**
 * Ajax endpoint which is used to remove currently selected widget details.
 */
-function tawk_to_remove_widget($a = 0, $b = 0) {
+function tawk_to_remove_widget() {
   $config = config(TawkHelper::TAWK_TO_CONFIG_NAME);
   $config->clear(TawkHelper::TAWK_TO_PAGE_ID);
   $config->clear(TawkHelper::TAWK_TO_WIDGET_ID);

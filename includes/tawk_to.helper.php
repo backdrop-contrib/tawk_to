@@ -30,7 +30,7 @@ class TawkHelper {
   public static function check_same_user($current_user) {
     $saved_user = config_get(
       TawkHelper::TAWK_TO_CONFIG_NAME,
-      TawkHelper::TAWK_TO_WIDGET_USER_ID,
+      TawkHelper::TAWK_TO_WIDGET_USER_ID
     );
 
     if (empty($saved_user)) {

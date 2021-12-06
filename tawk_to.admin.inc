@@ -19,7 +19,7 @@ function tawk_to_admin_form($form, &$form_state) {
   $iframe_url = TawkHelper::get_iframe_url();
   $display_opts = config_get(
     TawkHelper::TAWK_TO_CONFIG_NAME,
-    TawkHelper::TAWK_TO_WIDGET_OPTIONS,
+    TawkHelper::TAWK_TO_WIDGET_OPTIONS
   );
 
   if ($display_opts && !empty($display_opts)) {
