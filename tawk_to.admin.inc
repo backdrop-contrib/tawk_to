@@ -6,11 +6,21 @@
  * @license   GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+require_once 'includes/tawk_to.helper.php';
+
 /**
- * tawk.to widget visibility options form.
+ * tawk.to main admin form
  */
-function tawk_to_visibility_opts_form($form, &$form_state) {
-  $display_opts = config_get(TAWK_TO_CONFIG_NAME, TAWK_TO_WIDGET_OPTIONS);
+function tawk_to_admin_form($form, &$form_state) {
+  global $user;
+  $same_user = TawkHelper::check_same_user($user->uid);
+  $widget = TawkHelper::get_widget();
+  $base_url = TawkHelper::get_base_url();
+  $iframe_url = TawkHelper::get_iframe_url();
+  $display_opts = config_get(
+    TawkHelper::TAWK_TO_CONFIG_NAME,
+    TawkHelper::TAWK_TO_WIDGET_OPTIONS
+  );
 
   if ($display_opts && !empty($display_opts)) {
     $display_opts = json_decode($display_opts);
@@ -19,8 +29,78 @@ function tawk_to_visibility_opts_form($form, &$form_state) {
     $display_opts = null;
   }
 
+  // css and js files
+  $module_path = TawkHelper::get_module_path();
+  $form['#attached']['css'][] = array(
+    'data' => $module_path . '/css/tawk_to.admin.css',
+    'type' => 'file',
+  );
+  $form['#attached']['js'][] = array(
+    'data' => $module_path . '/js/tawk_to.admin.js',
+    'type' => 'file',
+  );
+
+  $form['#attached']['js'][] = array(
+    'data' => array(
+      'tawkto' => array(
+        'iframeUrl' => $iframe_url,
+        'baseUrl' => $base_url,
+      ),
+    ),
+    'type' => 'setting',
+  );
+
+  $form['widget_selection'] = build_widget_selection($same_user, $widget);
+  $form['visibility_settings'] = build_visibility_opts_form($display_opts);
+  $form['privacy_settings'] = build_privacy_settings_form($display_opts);
+
+  // submit button
+  $form['actions']['#type'] = 'actions';
+  $form['actions']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save configuration'),
+  );
+
+  $form['#submit'][] = 'tawk_to_admin_form_submit';
+
+  return $form;
+}
+
+/**
+ * builds tawk.to widget selection area
+ */
+function build_widget_selection($same_user, $widget) {
+  $form = array(
+    '#type' => 'fieldset',
+    '#title' => t('Property and Widget Selection'),
+    '#description' => t('Select the property and widget from your tawk.to account')
+  );
+
+  if(!$same_user) {
+    $form['already_set'] = array(
+      '#type' => 'markup',
+      '#markup' => '<div id="widget_already_set" class="alert alert-warning">Notice: Widget already set by other user</div>',
+    );
+  }
+
+  $form['iframe'] = array(
+    '#type' => 'markup',
+    '#markup' => '
+      <iframe id="tawkIframe" class="tawkto-property-widget-selection" src="" ></iframe>
+      <input type="hidden" class="hidden" name="page_id" value="' . $widget['page_id'] . '">
+      <input type="hidden" class="hidden" name="widget_id" value="' . $widget['widget_id'] . '">
+      ',
+  );
+
+  return $form;
+}
+
+/**
+ * builds tawk.to widget visibility options form.
+ */
+function build_visibility_opts_form($display_opts) {
   // visibility settings
-  $form['visibility_settings'] = array(
+  $form = array(
     '#type' => 'fieldset',
     '#title' => t('Visibility Settings'),
     '#description' => t('Define where the tawk.to widget will and won\'t show'),
@@ -32,7 +112,7 @@ function tawk_to_visibility_opts_form($form, &$form_state) {
     $always_display_attr['checked'] = true;
   }
 
-  $form['visibility_settings']['always_display'] = array(
+  $form['always_display'] = array(
     '#type' => 'checkbox',
     '#title' => t('Always show Tawk.To widget on every page'),
     '#description' => t('Select to show on all except the exceptions
@@ -42,7 +122,7 @@ function tawk_to_visibility_opts_form($form, &$form_state) {
   );
 
   // exclude url config
-  $form['visibility_settings']['hide_oncustom'] = array(
+  $form['hide_oncustom'] = array(
     '#type' => 'textarea',
     '#title' => t('Except on pages:'),
     '#description' => t('Add URLs to pages in which you would like to hide the widget.<br>
@@ -60,7 +140,7 @@ function tawk_to_visibility_opts_form($form, &$form_state) {
     $show_onfrontpage_attr['checked'] = true;
   }
 
-  $form['visibility_settings']['show_onfrontpage'] = array(
+  $form['show_onfrontpage'] = array(
     '#type' => 'checkbox',
     '#title' => t('Show on front page'),
     '#prefix' => '<div class="div_show_specific">',
@@ -75,7 +155,7 @@ function tawk_to_visibility_opts_form($form, &$form_state) {
     $show_ontaxonomy_attr['checked'] = true;
   }
 
-  $form['visibility_settings']['show_ontaxonomy'] = array(
+  $form['show_ontaxonomy'] = array(
     '#type' => 'checkbox',
     '#title' => t('Show on taxonomy pages'),
     '#description' => t('Select to show on pages for taxonomy terms'),
@@ -90,7 +170,7 @@ function tawk_to_visibility_opts_form($form, &$form_state) {
   if (!is_null($display_opts) && $display_opts->show_oncustom) {
     $show_oncustom_default_value = format_multiline_url_paths($display_opts->show_oncustom);
   }
-  $form['visibility_settings']['show_oncustom'] = array(
+  $form['show_oncustom'] = array(
     '#type' => 'textarea',
     '#title' => t('Show on pages:'),
     '#description' => t('Add URLs to pages in which you would like to show the widget.<br>
@@ -101,8 +181,15 @@ function tawk_to_visibility_opts_form($form, &$form_state) {
     '#default_value' =>  $show_oncustom_default_value,
   );
 
+  return $form;
+}
+
+/**
+ * builds tawk.to privacy settings form
+ */
+function build_privacy_settings_form($display_opts) {
   // privacy settings
-  $form['privacy_settings'] = array(
+  $form = array(
     '#type' => 'fieldset',
     '#title' => t('Privacy Settings'),
     '#description' => t('Define whether or not user information can be used'),
@@ -113,7 +200,7 @@ function tawk_to_visibility_opts_form($form, &$form_state) {
   if (!is_null($display_opts) && $display_opts->enable_visitor_recognition) {
     $enable_visitor_recognition_attr['checked'] = true;
   }
-  $form['privacy_settings']['enable_visitor_recognition'] = array(
+  $form['enable_visitor_recognition'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enable visitor recognition'),
     '#description' => t('If selected, name and email address from logged in users will be used to identify the user to you when a chat comes in via tawk.to'),
@@ -121,22 +208,13 @@ function tawk_to_visibility_opts_form($form, &$form_state) {
     '#attributes' => $enable_visitor_recognition_attr,
   );
 
-  // submit button
-  $form['actions']['#type'] = 'actions';
-  $form['actions']['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Save configuration'),
-  );
-
-  $form['#submit'][] = 'tawk_to_visibility_opts_form_submit';
-
   return $form;
 }
 
 /**
- * tawk.to visibility options form submit handler
+ * tawk.to admin form submit handler
  */
-function tawk_to_visibility_opts_form_submit($form, &$form_state) {
+function tawk_to_admin_form_submit($form, &$form_state) {
   $jsonOpts = array(
     'always_display' => false,
     'hide_oncustom' => array(),
@@ -167,7 +245,11 @@ function tawk_to_visibility_opts_form_submit($form, &$form_state) {
     }
   }
 
-  config_set(TAWK_TO_CONFIG_NAME, TAWK_TO_WIDGET_OPTIONS, json_encode($jsonOpts));
+  config_set(
+    TawkHelper::TAWK_TO_CONFIG_NAME,
+    TawkHelper::TAWK_TO_WIDGET_OPTIONS,
+    json_encode($jsonOpts)
+  );
 
   // Flush page cache so widget options will update at next page load
   cache_flush('page');
