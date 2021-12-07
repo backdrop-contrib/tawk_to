@@ -20,7 +20,7 @@ Visit our [Help Center](https://help.tawk.to) for answers to FAQs.
 
 # Issues
 
-Bugs and feature requests should be reported in the [Issue Queue](https://github.com/backdrop-contrib/tawk_to/issues).
+Bugs and feature requests should be reported in the [Issue Queue](https://github.com/backdrop-contrib/tawk-backdrop/issues).
 
 # Current Maintainers
 
