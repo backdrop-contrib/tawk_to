@@ -36,19 +36,3 @@ Bugs and feature requests should be reported in the [Issue Queue](https://github
 
 This project is GPL v3 software
 See the LICENSE.txt file in this directory for complete text.
-
-# About
-
-Backdrop CMS integration.
-
-# Releases
-
-No releases published
-
-# Packages
-
-No packages published
-
-# Languages
-
-- PHP 100.0%
