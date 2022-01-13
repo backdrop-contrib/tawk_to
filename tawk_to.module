@@ -207,14 +207,13 @@ function tawk_to_remove_widget() {
   backdrop_json_output(array('success' => true));
 }
 
-
 /**
- * Implements hook_config_info().
- */
+* Implements hook_config_info().
+*/
 function tawk_to_config_info() {
-    $info[TawkHelper::TAWK_TO_CONFIG_NAME] = array(
+  $prefixes[TawkHelper::TAWK_TO_CONFIG_NAME] = array(
     'label' => t('tawk.to'),
     'group' => t('Configuration'),
   );
-  return $info;
+  return $prefixes;
 }
