@@ -1,2 +1,6 @@
 *.module linguist-language=php
 *.inc linguist-language=php
+
+/.gitignore export-ignore
+/.github export-ignore
+/tmp export-ignore
