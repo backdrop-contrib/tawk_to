@@ -8,7 +8,7 @@
 
 require_once 'tawk_to.admin.inc';
 require_once 'includes/tawk_to.helper.php';
-require_once 'vendor/autoload.php';
+require_once 'libraries/autoload.php';
 
 use Tawk\Modules\UrlPatternMatcher;
 
