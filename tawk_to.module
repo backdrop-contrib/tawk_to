@@ -9,13 +9,27 @@
 require_once 'tawk_to.admin.inc';
 require_once 'includes/tawk_to.helper.php';
 
+function tawk_to_autoload_info() {
+  return array(
+    'Tawk\Modules\UrlPatternMatcher' => 'libraries/tawk/url-utils/lib/Modules/UrlPatternMatcher.php',
+    'Tawk\Modules\PathPatternMatcher' => 'libraries/tawk/url-utils/lib/Modules/PathPatternMatcher.php',
+    'Tawk\Helpers\UrlHelper' => 'libraries/tawk/url-utils/lib/Helpers/UrlHelper.php',
+    'Tawk\Helpers\PathHelper' => 'libraries/tawk/url-utils/lib/Helpers/PathHelper.php',
+    'Tawk\Helpers\Common' => 'libraries/tawk/url-utils/lib/Helpers/Common.php',
+    'Tawk\Models\PathPattern' => 'libraries/tawk/url-utils/lib/Models/PathPattern.php',
+    'Tawk\Enums\WildcardLocation' => 'libraries/tawk/url-utils/lib/Enums/WildcardLocation.php',
+  );
+}
+
+use Tawk\Modules\UrlPatternMatcher;
+
 /**
 * Implements hook_preprocess_page().
 * Ensures widget appears on all defined pages
 */
 function tawk_to_preprocess_page(&$variables) {
   global $user;
-  $base_url = TawkHelper::get_base_url();
+  global $base_url;
 
   // backend checking; do not show chat widget on admin page(s)
   if (path_is_admin(current_path())) {
@@ -54,11 +68,8 @@ function tawk_to_preprocess_page(&$variables) {
       $showPages = json_decode($options->show_oncustom);
       $show = false;
 
-      foreach ($showPages as $slug) {
-        if ($currentUrl == $base_url.$slug) {
-          $show = true;
-          break;
-        }
+      if (UrlPatternMatcher::match($currentUrl, $showPages)) {
+        $show = true;
       }
 
       // taxonomy term pages
@@ -85,14 +96,8 @@ function tawk_to_preprocess_page(&$variables) {
         $show = true;
 
         $currentUrl = (string) $currentUrl;
-        foreach ($hide_pages as $slug) {
-          // we need to add htmlspecialchars due to slashes added when saving to database
-          $slug = (string) htmlspecialchars($slug);
-
-          if ($currentUrl == $base_url.$slug) {
-            $show = false;
-            break;
-          }
+        if (UrlPatternMatcher::match($currentUrl, $hide_pages)) {
+          $show = false;
         }
 
         if (!$show) {
